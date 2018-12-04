@@ -4,12 +4,13 @@
 #include <unordered_set>
 #include <algorithm>
 #include <string>
+#include "XGuid.h"
 
 using namespace std;
 
-
 void TestVector();
 void TestHashSet();
+
 
 struct Rect
 {
@@ -48,13 +49,21 @@ struct Grid
 };
 
 struct Hash 
-{
+{ 
+    static string Seed;
+    static void GenerateNewSeed()
+    {
+        Seed = XGUID::CreateGuidString();
+    }
+
    size_t operator() (const Grid &grid) const 
    {
-        string temp = to_string(grid.row) + to_string(grid.col);
+        string temp = to_string(grid.row) + to_string(grid.col) + Seed;
         return hash<string>()(temp);
    }
 };
+
+string Hash::Seed = "";
 
 int main(int argc, char *argv[])
 {
