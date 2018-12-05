@@ -10,7 +10,7 @@ using namespace std;
 
 void TestVector();
 void TestHashSet();
-
+void TestSharedPtr();
 
 struct Rect
 {
@@ -46,6 +46,10 @@ struct Grid
     {
         return (row==other.row && col==other.col);
     }
+    ~Grid()
+    {
+        printf("~Grid()\n");
+    }
 };
 
 struct Hash 
@@ -68,7 +72,8 @@ string Hash::Seed = "";
 int main(int argc, char *argv[])
 {
     //TestVector();
-    TestHashSet();
+    //TestHashSet();
+    TestSharedPtr();
     getchar();
     return 0;
 }
@@ -112,4 +117,34 @@ void TestHashSet()
 
     for (it=hashSet.begin(); it!=hashSet.end(); it++)
         printf("grid(%d,%d)\n",it->row,it->col);
+}
+
+void TestSharedPtr()
+{
+    Grid *qGrid = NULL;
+    printf("qGrid = %p\n",qGrid);
+    
+    shared_ptr<Grid> pGrid(new Grid(2,4));
+    //auto pInt = std::make_shared<int>(2);
+    qGrid = pGrid.get();
+    weak_ptr<Grid> wGrid = pGrid;
+        
+    printf("qGrid = %p\n",qGrid);
+    printf("grid(%d,%d)\n",pGrid->row,pGrid->col);
+    printf("use count = %ld\n",pGrid.use_count());
+    {
+        shared_ptr<Grid> rGrid = pGrid;
+        printf("use count = %ld\n",pGrid.use_count());
+    }
+    printf("use count = %ld\n",pGrid.use_count());
+
+    pGrid.reset();
+    printf("qGrid = %p\n",qGrid);
+    printf("use count = %ld\n",wGrid.use_count());
+    if (wGrid.expired())
+        printf("expired\n");
+    shared_ptr<Grid> sGrid = wGrid.lock();
+    if (sGrid == nullptr)
+        printf("nullptr\n");
+
 }
